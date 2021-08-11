@@ -40,7 +40,7 @@
                         <div class="tab-pane active" id="tabs-1" role="tabpanel">
                             <h2 class="mt-3">登入</h2>
                             <!-- Form -->
-                            <form class="form" method="post" action="{{ route('login.submit') }}">
+                            <form class="form" method="post" action="{{ route('zshop-login-submit') }}">
                                 @csrf
                                 <div class="row">
                                     <div class="col-12">
@@ -72,7 +72,7 @@
                                                     type="checkbox" class="my-auto">記住我</label>
                                         </div>
                                         @if (Route::has('password.request'))
-                                            <a class="lost-pass my-auto" href="{{ route('password.reset') }}">
+                                            <a class="lost-pass my-auto" href="{{ route('zshop-forget-password') }}">
                                                 忘記密碼?
                                             </a>
                                         @endif
@@ -83,7 +83,7 @@
                         <div class="tab-pane" id="tabs-2" role="tabpanel">
                             <h2 class="mt-3">註冊</h2>
                             <!-- Form -->
-                            <form class="form" method="post" action="{{ route('register.submit') }}">
+                            <form class="form" method="post" action="{{ route('zshop-register-submit') }}">
                                 @csrf
                                 <div class="row">
                                     <div class="col-12">

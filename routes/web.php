@@ -23,7 +23,7 @@ Route::get('user/register', 'FrontendController@register')->name('register.form'
 Route::post('user/register', 'FrontendController@registerSubmit')->name('register.submit');
 
 // Reset password
-Route::post('password-reset', 'FrontendController@showResetForm')->name('password.reset');
+Route::get('password-reset', 'FrontendController@showResetForm')->name('password.reset');
 
 // Socialite
 Route::get('login/{provider}/', 'Auth\LoginController@redirect')->name('login.redirect');
@@ -194,9 +194,34 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']
 
 
 
+
+
+
 // ZShop
 
 Route::group(['prefix' => 'zshop'], function () {
-    Route::get('/', 'ZshopController@home')->name('zshop-home');
+    Route::get('/', 'ZshopController@index')->name('zshop-index');
+
+    // 會員註冊 登入 忘記密碼
     Route::get('/login-register', 'ZshopController@login')->name('zshop-login-register');
+    Route::post('/login', 'ZshopController@loginSubmit')->name('zshop-login-submit');
+    Route::post('/register', 'ZshopController@registerSubmit')->name('zshop-register-submit');
+    Route::get('/forget-password', 'ZshopController@forgetPassword')->name('zshop-forget-password');
+
+    // 商品搜尋 商品分類 商品介紹
+    Route::get('/productlist-category/{slug}', 'ZshopController@productlistByCategory')->name('productlist-category');
+    Route::get('/product-detail/{slug}', 'ZshopController@productDetail')->name('product-detail');
+    Route::post('/product/search', 'ZshopController@productSearch')->name('product.search');
+    Route::get('/product-sub-cat/{slug}/{sub_slug}', 'ZshopController@productSubCat')->name('zshop-product-sub-category');
+    Route::get('/product-brand/{slug}', 'ZshopController@productBrand')->name('product-brand');
+});
+
+Route::group(['prefix' => 'zshop/user'], function () {
+    // 個人中心 購物金 訂單查詢 退貨查詢 收藏清單 問答中心
+    Route::get('/home', 'ZshopController@home')->name('zshop-user-home');
+    Route::get('/zshop-money', 'ZshopController@zshopMoney')->name('zshop-user-zshop-money');
+    Route::get('/orders', 'ZshopController@orders')->name('zshop-user-orders');
+    Route::get('/returned', 'ZshopController@returned')->name('zshop-user-returned');
+    Route::get('/wishlist', 'ZshopController@wishlist')->name('zshop-user-wishlist');
+    Route::get('/qa-center', 'ZshopController@qaCenter')->name('zshop-user-qa-center');
 });
