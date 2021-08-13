@@ -22,4 +22,9 @@ class Coupon extends Model
             return 0;
         }
     }
+
+    public function order()
+    {
+        return $this->belongsTo('App\Models\Order', 'order_id');
+    }
 }

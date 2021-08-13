@@ -256,7 +256,7 @@
                                                     @endphp
                                                     <del>原價 ${{ number_format($product->price, 2) }}</del>
                                                     <h5 class="text-danger">特價 ${{ number_format($after_discount, 2) }}</h5>
-                                                    <a href="{{ route('add-to-cart', $product->slug) }}" class="btn cart"
+                                                    <a href="{{ route('zshop-add-to-cart', $product->slug) }}" class="btn cart"
                                                         data-id="{{ $product->id }}">加入購物車</a>
                                                 </div>
                                             </div>
@@ -370,7 +370,7 @@
                                             </ul>
                                         </div>
                                     @endif
-                                    <form action="{{ route('single-add-to-cart') }}" method="POST">
+                                    <form action="{{ route('zshop-single-add-to-cart') }}" method="POST">
                                         @csrf
                                         <div class="quantity">
                                             <!-- Input Order -->

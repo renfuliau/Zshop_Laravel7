@@ -10,58 +10,62 @@ use App\Models\Post;
 use App\Models\Banner;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Settings;
 use App\Models\Wishlist;
 use App\Models\UserLevel;
 use Illuminate\Http\Request;
 use App\Rules\MatchOldPassword;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Hash;
 
 class ZshopController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $category = Category::getAllParentWithChild();
-        $banners=Banner::where('status','active')->limit(3)->orderBy('id','DESC')->get();
+        $banners = Banner::where('status', 'active')->limit(3)->orderBy('id', 'DESC')->get();
         return view('zshop.layouts.index')
-                ->with('banners',$banners)
-                ->with('category', $category);
+            ->with('banners', $banners)
+            ->with('category', $category);
     }
 
-    public function login(){
+    public function login()
+    {
         $category = Category::getAllParentWithChild();
         return view('zshop.layouts.pages.login-register')->with('category', $category);
     }
 
-    public function loginSubmit(Request $request){
-        $data= $request->all();
-        if(Auth::attempt(['email' => $data['email'], 'password' => $data['password'],'status'=>'active'])){
-            Session::put('user',$data['email']);
-            request()->session()->flash('success','Successfully login');
+    public function loginSubmit(Request $request)
+    {
+        $data = $request->all();
+        if (Auth::attempt(['email' => $data['email'], 'password' => $data['password'], 'status' => 'active'])) {
+            Session::put('user', $data['email']);
+            request()->session()->flash('success', 'Successfully login');
             return redirect()->route('zshop-index');
-        }
-        else{
-            request()->session()->flash('error','Invalid email and password pleas try again!');
+        } else {
+            request()->session()->flash('error', 'Invalid email and password pleas try again!');
             return redirect()->back();
         }
     }
 
-    public function registerSubmit(Request $request){
+    public function registerSubmit(Request $request)
+    {
         // return $request->all();
-        $this->validate($request,[
-            'email'=>'string|required|unique:users,email',
-            'password'=>'required|min:6|confirmed',
+        $this->validate($request, [
+            'email' => 'string|required|unique:users,email',
+            'password' => 'required|min:6|confirmed',
         ]);
-        $data=$request->all();
+        $data = $request->all();
         // $data['user_level_id'] = 1;
         // dd($data);
-        $check=$this->create($data);
-        Session::put('user',$data['email']);
-        if($check){
-            request()->session()->flash('success','Successfully registered');
+        $check = $this->create($data);
+        Session::put('user', $data['email']);
+        if ($check) {
+            request()->session()->flash('success', 'Successfully registered');
             return redirect()->route('zshop-login-register');
-        }
-        else{
-            request()->session()->flash('error','Please try again!');
+        } else {
+            request()->session()->flash('error', 'Please try again!');
             return back();
         }
     }
@@ -76,7 +80,8 @@ class ZshopController extends Controller
         ]);
     }
 
-    public function forgetPassword(){
+    public function forgetPassword()
+    {
         return view('zshop.auth.passwords.forget-password');
     }
 
@@ -86,8 +91,8 @@ class ZshopController extends Controller
         $photo_path = Settings::getPhoto()->photo;
         // dd($photo_path);
         return view('zshop.layouts.pages.contact')
-        ->with('photo_path', $photo_path)
-        ->with('category', $category);
+            ->with('photo_path', $photo_path)
+            ->with('category', $category);
     }
 
 
@@ -136,9 +141,9 @@ class ZshopController extends Controller
 
 
         return view('zshop.layouts.pages.productlist-all')
-        ->with('products', $products)
-        ->with('recent_products', $recent_products)
-        ->with('category', $category);
+            ->with('products', $products)
+            ->with('recent_products', $recent_products)
+            ->with('category', $category);
     }
 
     public function productlistByCategory(Request $request)
@@ -153,7 +158,7 @@ class ZshopController extends Controller
         // if (request()->is('e-shop.loc/product-grids')) {
         //     return view('frontend.pages.product-grids')->with('products', $products->products)->with('recent_products', $recent_products);
         // } else {
-            return view('zshop.layouts.pages.productlist')
+        return view('zshop.layouts.pages.productlist')
             ->with('products', $products->products)
             ->with('recent_products', $recent_products)
             ->with('category', $category)
@@ -174,7 +179,7 @@ class ZshopController extends Controller
         // if (request()->is('e-shop.loc/product-grids')) {
         //     return view('frontend.pages.product-grids')->with('products', $products->sub_products)->with('recent_products', $recent_products);
         // } else {
-            return view('zshop.layouts.pages.productlist')
+        return view('zshop.layouts.pages.productlist')
             ->with('products', $products->sub_products)
             ->with('recent_products', $recent_products)
             ->with('category', $category)
@@ -186,15 +191,47 @@ class ZshopController extends Controller
 
 
     // 購物車
-    protected $product=null;
-    public function __construct(Product $product){
-        $this->product=$product;
+    protected $product = null;
+    public function __construct(Product $product)
+    {
+        $this->product = $product;
     }
 
     public function cart()
     {
         $category = Category::getAllParentWithChild();
-        return view('zshop.layouts.pages.cart')->with('category', $category);
+        $user = Auth()->user();
+        // dd($user);
+        $cart = Cart::with('product')->where('user_id', $user->id)->where('order_id', null)->get();
+
+        $total_amount = 0;
+        foreach ($cart as $key => $value) {
+            $total_amount += $value->amount;
+        }
+
+        $coupon1 = Coupon::where([
+            ['coupon_line', '=', Coupon::where([
+                ['coupon_line', '<', $total_amount],
+                ['coupon_type', '=', 1]
+            ])->get()->max('coupon_line')],
+            ['coupon_type', '=', 1]
+        ])->first           ();
+        // dd($coupon1);
+
+        $coupon2 = Coupon::where([
+            ['coupon_line', '=', Coupon::where([
+                ['coupon_line', '<', $total_amount],
+                ['coupon_type', '=', 2]
+            ])->get()->max('coupon_line')],
+            ['coupon_type', '=', 2]
+        ])->first();
+        // dd($coupon2);
+
+        return view('zshop.layouts.pages.cart')
+            ->with('category', $category)
+            ->with('cart', $cart)
+            ->with('coupon1', $coupon1)
+            ->with('coupon2', $coupon2);
     }
 
     public function checkout()
@@ -203,142 +240,151 @@ class ZshopController extends Controller
         return view('zshop.layouts.pages.checkout')->with('category', $category);
     }
 
-    public function addToCart(Request $request){
+    public function addToCart(Request $request)
+    {
         // dd($request->all());
         if (empty($request->slug)) {
-            request()->session()->flash('error','Invalid Products');
+            request()->session()->flash('error', 'Invalid Products');
             return back();
         }
         $product = Product::where('slug', $request->slug)->first();
         // return $product;
         if (empty($product)) {
-            request()->session()->flash('error','Invalid Products');
+            request()->session()->flash('error', 'Invalid Products');
             return back();
         }
 
-        $already_cart = Cart::where('user_id', auth()->user()->id)->where('order_id',null)->where('product_id', $product->id)->first();
+        $already_cart = Cart::where('user_id', auth()->user()->id)->where('order_id', null)->where('product_id', $product->id)->first();
         // return $already_cart;
-        if($already_cart) {
+        if ($already_cart) {
             // dd($already_cart);
             $already_cart->quantity = $already_cart->quantity + 1;
-            $already_cart->amount = $product->price+ $already_cart->amount;
+            $already_cart->amount = ($product->price * (100 - $product->discount) * 0.01) + $already_cart->amount;
             // return $already_cart->quantity;
-            if ($already_cart->product->stock < $already_cart->quantity || $already_cart->product->stock <= 0) return back()->with('error','Stock not sufficient!.');
+            if ($already_cart->product->stock < $already_cart->quantity || $already_cart->product->stock <= 0) return back()->with('error', 'Stock not sufficient!.');
             $already_cart->save();
-
-        }else{
+        } else {
 
             $cart = new Cart;
             $cart->user_id = auth()->user()->id;
             $cart->product_id = $product->id;
-            $cart->price = ($product->price-($product->price*$product->discount)/100);
+            $cart->price = ($product->price - ($product->price * $product->discount) / 100);
             $cart->quantity = 1;
-            $cart->amount=$cart->price*$cart->quantity;
-            if ($cart->product->stock < $cart->quantity || $cart->product->stock <= 0) return back()->with('error','Stock not sufficient!.');
+            $cart->amount = $cart->price * $cart->quantity;
+            if ($cart->product->stock < $cart->quantity || $cart->product->stock <= 0) return back()->with('error', 'Stock not sufficient!.');
             $cart->save();
-            $wishlist=Wishlist::where('user_id',auth()->user()->id)->where('cart_id',null)->update(['cart_id'=>$cart->id]);
+            $wishlist = Wishlist::where('user_id', auth()->user()->id)->where('cart_id', null)->update(['cart_id' => $cart->id]);
         }
-        request()->session()->flash('success','Product successfully added to cart');
+        request()->session()->flash('success', 'Product successfully added to cart');
         return back();
     }
 
 
 
     // 會員中心
-    public function home(){
+    public function home()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         // dd($profile);
         $user_level = UserLevel::getUserLevelName($profile->user_level_id);
         // dd($user_level);
         // return $profile;
         return view('zshop.user.users.profile')
-        ->with('category',$category)
-        ->with('profile',$profile)
-        ->with('user_level', $user_level);
+            ->with('category', $category)
+            ->with('profile', $profile)
+            ->with('user_level', $user_level);
     }
 
-    public function profileUpdate(Request $request,$id){
+    public function profileUpdate(Request $request, $id)
+    {
         // return $request->all();
-        $user=User::findOrFail($id);
+        $user = User::findOrFail($id);
         // dd($user);
-        $data=$request->all();
-        $status=$user->fill($data)->save();
-        if($status){
-            request()->session()->flash('success','Successfully updated your profile');
-        }
-        else{
-            request()->session()->flash('error','Please try again!');
+        $data = $request->all();
+        $status = $user->fill($data)->save();
+        if ($status) {
+            request()->session()->flash('success', 'Successfully updated your profile');
+        } else {
+            request()->session()->flash('error', 'Please try again!');
         }
         return redirect()->back();
     }
 
-    public function changePassword(){
+    public function changePassword()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         return view('zshop.user.users.change-password')
-        ->with('category',$category)
-        ->with('profile',$profile);
+            ->with('category', $category)
+            ->with('profile', $profile);
         // return view('zshop.user.users.change-password');
     }
     public function changPasswordStore(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required', new MatchOldPassword],
-            'new_password' => ['required'],
-            'new_confirm_password' => ['same:new_password'],
-        ],
-        [
-            'same' => '確認密碼錯誤，請重新輸入!'
-        ]);
+        $request->validate(
+            [
+                'current_password' => ['required', new MatchOldPassword],
+                'new_password' => ['required'],
+                'new_confirm_password' => ['same:new_password'],
+            ],
+            [
+                'same' => '確認密碼錯誤，請重新輸入!'
+            ]
+        );
 
-        User::find(auth()->user()->id)->update(['password'=> Hash::make($request->new_password)]);
+        User::find(auth()->user()->id)->update(['password' => Hash::make($request->new_password)]);
 
-        return redirect()->route('zshop-user-home')->with('success','Password successfully changed');
+        return redirect()->route('zshop-user-home')->with('success', 'Password successfully changed');
     }
 
-    public function rewardMoney(){
+    public function rewardMoney()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         // return $profile;
         return view('zshop.user.users.reward-money')
-        ->with('category',$category)
-        ->with('profile',$profile);
+            ->with('category', $category)
+            ->with('profile', $profile);
     }
 
-    public function orders(){
+    public function orders()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         // return $profile;
         return view('zshop.user.users.orders')
-        ->with('category',$category)
-        ->with('profile',$profile);
+            ->with('category', $category)
+            ->with('profile', $profile);
     }
 
-    public function returned(){
+    public function returned()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         // return $profile;
         return view('zshop.user.users.returned')
-        ->with('category',$category)
-        ->with('profile',$profile);
+            ->with('category', $category)
+            ->with('profile', $profile);
     }
 
-    public function wishlist(){
+    public function wishlist()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         // return $profile;
         return view('zshop.user.users.wishlist')
-        ->with('category',$category)
-        ->with('profile',$profile);
+            ->with('category', $category)
+            ->with('profile', $profile);
     }
 
-    public function qaCenter(){
+    public function qaCenter()
+    {
         $category = Category::getAllParentWithChild();
-        $profile=Auth()->user();
+        $profile = Auth()->user();
         // return $profile;
         return view('zshop.user.users.qa-center')
-        ->with('category',$category)
-        ->with('profile',$profile);
+            ->with('category', $category)
+            ->with('profile', $profile);
     }
 }

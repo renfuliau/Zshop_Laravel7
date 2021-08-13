@@ -16,6 +16,10 @@ class CreateCouponsTable extends Migration
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
+            $table->string('name'); // new
+            $table->integer('coupon_line'); // new
+            $table->integer('coupon_amount'); // new
+            $table->integer('coupon_type'); // new
             $table->enum('type',['fixed','percent'])->default('fixed');
             $table->decimal('value',20,2);
             $table->enum('status',['active','inactive'])->default('inactive');

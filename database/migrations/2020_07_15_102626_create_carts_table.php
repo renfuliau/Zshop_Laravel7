@@ -20,6 +20,7 @@ class CreateCartsTable extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->float('price');
             $table->enum('status',['new','progress','delivered','cancel'])->default('new');
+            $table->integer('order_item_status'); // new
             $table->integer('quantity');
             $table->float('amount');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('CASCADE');
