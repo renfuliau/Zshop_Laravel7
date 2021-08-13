@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ZshopController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -202,24 +203,39 @@ Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']
 Route::group(['prefix' => 'zshop'], function () {
     Route::get('/', 'ZshopController@index')->name('zshop-index');
 
-    // 會員註冊 登入 忘記密碼
+    // 會員註冊 登入 忘記密碼 聯絡客服
     Route::get('/login-register', 'ZshopController@login')->name('zshop-login-register');
     Route::post('/login', 'ZshopController@loginSubmit')->name('zshop-login-submit');
     Route::post('/register', 'ZshopController@registerSubmit')->name('zshop-register-submit');
     Route::get('/forget-password', 'ZshopController@forgetPassword')->name('zshop-forget-password');
+    Route::get('/contact', 'ZshopController@contact')->name('zshop-contact');
+    // Route::post('/contact/message', 'MessageController@store')->name('contact.store');
 
     // 商品搜尋 商品分類 商品介紹
-    Route::get('/productlist-category/{slug}', 'ZshopController@productlistByCategory')->name('productlist-category');
+    Route::get('/productlist', 'ZshopController@productlist')->name('zshop-productlist');
+    Route::get('/productlist-category/{slug}', 'ZshopController@productlistByCategory')->name('zshop-productlist-category');
+    Route::get('/productlist-category/{slug}/{sub_slug}', 'ZshopController@productSubcategory')->name('zshop-productlist-subcategory');
     Route::get('/product-detail/{slug}', 'ZshopController@productDetail')->name('product-detail');
     Route::post('/product/search', 'ZshopController@productSearch')->name('product.search');
-    Route::get('/product-sub-cat/{slug}/{sub_slug}', 'ZshopController@productSubCat')->name('zshop-product-sub-category');
     Route::get('/product-brand/{slug}', 'ZshopController@productBrand')->name('product-brand');
+
+    // 購物車
+    Route::get('/cart', 'ZshopController@cart')->name('zshop-cart');
+    Route::get('/checkout', 'ZshopController@checkout')->name('zshop-checkout')->middleware('user');
+    Route::get('/add-to-cart/{slug}', 'ZshopController@addToCart')->name('zshop-add-to-cart')->middleware('user');
+    Route::post('/add-to-cart', 'ZshopController@singleAddToCart')->name('zshop-single-add-to-cart')->middleware('user');
+    Route::get('cart-delete/{id}', 'ZshopController@cartDelete')->name('zshop-cart-delete');
+    Route::post('cart-update', 'ZshopController@cartUpdate')->name('zshop-cart.update');
 });
 
 Route::group(['prefix' => 'zshop/user'], function () {
     // 個人中心 購物金 訂單查詢 退貨查詢 收藏清單 問答中心
     Route::get('/home', 'ZshopController@home')->name('zshop-user-home');
-    Route::get('/zshop-money', 'ZshopController@zshopMoney')->name('zshop-user-zshop-money');
+    Route::post('/profile/{id}', 'ZshopController@profileUpdate')->name('zshop-user-profile-update');
+    Route::get('/change-password', 'ZshopController@changePassword')->name('zshop-user-change-password');
+    Route::post('/change-password', 'ZshopController@changPasswordStore')->name('zshop-user-change-password-update');
+
+    Route::get('/reward-money', 'ZshopController@rewardMoney')->name('zshop-user-reward-money');
     Route::get('/orders', 'ZshopController@orders')->name('zshop-user-orders');
     Route::get('/returned', 'ZshopController@returned')->name('zshop-user-returned');
     Route::get('/wishlist', 'ZshopController@wishlist')->name('zshop-user-wishlist');

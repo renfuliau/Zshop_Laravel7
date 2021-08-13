@@ -5,34 +5,26 @@
 @section('main-content')
 <div class="container">
     <div class="card shadow mb-4">
-        <div class="row">
-            <div class="col-md-12">
-                @include('backend.layouts.notification')
-            </div>
-        </div>
         <div class="card-header py-3">
             {{-- <h4 class=" font-weight-bold">Profile</h4> --}}
-
-
-
             <ul class="nav nav-tabs nav-fill">
                 <li class="nav-item">
                     <a class="nav-link active" href="#">個人中心</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('zshop-user-zshop-money')}}">購物金</a>
+                    <a class="nav-link" href="{{ route('zshop-user-reward-money') }}">購物金</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('zshop-user-orders')}}">訂單查詢</a>
+                    <a class="nav-link" href="{{ route('zshop-user-orders') }}">訂單查詢</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('zshop-user-returned')}}">退貨查詢</a>
+                    <a class="nav-link" href="{{ route('zshop-user-returned') }}">退貨查詢</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('zshop-user-wishlist')}}">收藏清單</a>
+                    <a class="nav-link" href="{{ route('zshop-user-wishlist') }}">收藏清單</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('zshop-user-qa-center')}}">問答中心</a>
+                    <a class="nav-link" href="{{ route('zshop-user-qa-center') }}">問答中心</a>
                 </li>
             </ul>
 
@@ -44,83 +36,57 @@
             </ul>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
+            <div class="row d-flex justify-content-center">
+                <div class="col-10">
+                    <h5 class="card-title text-left my-4"><small><i class="ti-crown"></i>
+                            {{ $user_level->name }}</small></h5>
                     <div class="card">
-                        <div class="image">
-                            @if ($profile->photo)
-                                <img class="card-img-top img-fluid roundend-circle mt-4"
-                                    style="border-radius:50%;height:80px;width:80px;margin:auto;"
-                                    src="{{ $profile->photo }}" alt="profile picture">
-                            @else
-                                <img class="card-img-top img-fluid roundend-circle mt-4"
-                                    style="border-radius:50%;height:80px;width:80px;margin:auto;"
-                                    src="{{ asset('backend/img/avatar.png') }}" alt="profile picture">
-                            @endif
-                        </div>
-                        <div class="card-body mt-4 ml-2">
-                            <h5 class="card-title text-left"><small><i class="fas fa-user"></i>
-                                    {{ $profile->name }}</small></h5>
-                            <p class="card-text text-left"><small><i class="fas fa-envelope"></i>
-                                    {{ $profile->email }}</small></p>
-                            <p class="card-text text-left"><small class="text-muted"><i class="fas fa-hammer"></i>
-                                    {{ $profile->role }}</small></p>
+                        <div class="card-body mt-4">
+                            <form class="border px-4 pt-2 pb-3" method="POST"
+                                action="{{ route('zshop-user-profile-update', $profile->id) }}">
+                                @csrf
+                                <div class="row d-flex justify-content-center">
+                                    <div class="form-group col-lg-6 col-12">
+                                        <label for="inputTitle" class="col-form-label">姓名</label>
+                                        <input id="inputTitle" type="text" name="name" placeholder="輸入姓名"
+                                            value="{{ $profile->name }}" class="form-control">
+                                        @error('name')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+    
+                                    <div class="form-group col-lg-6 col-12">
+                                        <label for="inputEmail" class="col-form-label">Email</label>
+                                        <input id="inputEmail" type="email" name="email" placeholder="輸入 Email"
+                                            value="{{ $profile->email }}" class="form-control">
+                                        @error('email')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group col-lg-6 col-12">
+                                        <label for="inputPhone" class="col-form-label">手機</label>
+                                        <input id="inputPhone" type="phone" name="phone" placeholder="輸入手機"
+                                            value="{{ $profile->phone }}" class="form-control">
+                                        @error('phone')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group col-lg-6 col-12">
+                                        <label for="inputAddress" class="col-form-label">地址</label>
+                                        <input id="inputAddress" type="address" name="address" placeholder="輸入地址"
+                                            value="{{ $profile->address }}" class="form-control">
+                                        @error('address')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-sm">儲存變更</button>
+                                </div>
+                            </form>
+                            <div class="text-center">
+                                <i class="ti-lock"></i><a href="{{ route('zshop-user-change-password') }}">變更密碼</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-8">
-                    <form class="border px-4 pt-2 pb-3" method="POST"
-                        action="{{ route('user-profile-update', $profile->id) }}">
-                        @csrf
-                        <div class="form-group">
-                            <label for="inputTitle" class="col-form-label">Name</label>
-                            <input id="inputTitle" type="text" name="name" placeholder="Enter name"
-                                value="{{ $profile->name }}" class="form-control">
-                            @error('name')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="inputEmail" class="col-form-label">Email</label>
-                            <input id="inputEmail" disabled type="email" name="email" placeholder="Enter email"
-                                value="{{ $profile->email }}" class="form-control">
-                            @error('email')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="inputPhoto" class="col-form-label">Photo</label>
-                            <div class="input-group">
-                                <span class="input-group-btn">
-                                    <a id="lfm" data-input="thumbnail" data-preview="holder" class="btn btn-primary">
-                                        <i class="fa fa-picture-o"></i> Choose
-                                    </a>
-                                </span>
-                                <input id="thumbnail" class="form-control" type="text" name="photo"
-                                    value="{{ $profile->photo }}">
-                            </div>
-                            @error('photo')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="role" class="col-form-label">Role</label>
-                            <select name="role" class="form-control">
-                                <option value="">-----Select Role-----</option>
-                                <option value="admin" {{ $profile->role == 'admin' ? 'selected' : '' }}>Admin
-                                </option>
-                                <option value="user" {{ $profile->role == 'user' ? 'selected' : '' }}>User
-                                </option>
-                            </select>
-                            @error('role')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <button type="submit" class="btn btn-success btn-sm">Update</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -152,31 +118,9 @@
     content: "/\00a0";
 }
 
-.image {
-    background: url('{{ asset('backend/img/background.jpg') }}');
-    height: 150px;
-    background-position: center;
-    background-attachment: cover;
-    position: relative;
-}
-
-.image img {
-    position: absolute;
-    top: 55%;
-    left: 35%;
-    margin-top: 30%;
-}
-
 i {
     font-size: 14px;
     padding-right: 8px;
 }
 
 </style>
-
-@push('scripts')
-<script src="/vendor/laravel-filemanager/js/stand-alone-button.js"></script>
-<script>
-    $('#lfm').filemanager('image');
-</script>
-@endpush

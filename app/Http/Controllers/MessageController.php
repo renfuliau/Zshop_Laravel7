@@ -43,9 +43,9 @@ class MessageController extends Controller
         $this->validate($request,[
             'name'=>'string|required|min:2',
             'email'=>'email|required',
-            'message'=>'required|min:20|max:200',
-            'subject'=>'string|required',
-            'phone'=>'numeric|required'
+            'message'=>'required|min:10|max:200',
+            // 'subject'=>'string',
+            // 'phone'=>'numeric'
         ]);
         // return $request->all();
 
@@ -56,11 +56,11 @@ class MessageController extends Controller
         $data['date']=$message->created_at->format('F d, Y h:i A');
         $data['name']=$message->name;
         $data['email']=$message->email;
-        $data['phone']=$message->phone;
+        // $data['phone']=$message->phone;
         $data['message']=$message->message;
-        $data['subject']=$message->subject;
-        $data['photo']=Auth()->user()->photo;
-        // return $data;    
+        // $data['subject']=$message->subject;
+        // $data['photo']=Auth()->user()->photo;
+        // return $data;
         event(new MessageSent($data));
         exit();
     }

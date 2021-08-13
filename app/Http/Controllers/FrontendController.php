@@ -247,6 +247,7 @@ class FrontendController extends Controller
             return view('frontend.pages.product-lists')->with('products', $products->products)->with('recent_products', $recent_products);
         }
     }
+
     public function productSubCat(Request $request)
     {
         $products = Category::getProductBySubCat($request->sub_slug);

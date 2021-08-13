@@ -16,9 +16,9 @@
                                     <li><i class="ti-user"></i> <a href="{{ route('zshop-user-home') }}"
                                             target="_blank">會員中心</a>
                                     </li>
-                                    <li><a href="{{ route('cart') }}" class="single-icon"><i class="ti-shopping-cart"></i>
+                                    <li><a href="{{ route('zshop-cart') }}" class="single-icon"><i class="ti-shopping-cart"></i>
                                             <span class="total-count">{{ Helper::cartCount() }}</span></a></li>
-                                    <li><i class="ti-email"></i><a href="{{ route('login.form') }}">聯絡客服</a>
+                                    <li><i class="ti-email"></i><a href="{{ route('zshop-contact') }}">聯絡客服</a>
                                     </li>
 
                                 @else
@@ -26,7 +26,7 @@
                                     </li>
                                     <li><i class="ti-power-off"></i><a href="{{ route('zshop-login-register') }}">登入 /
                                             註冊</a></li>
-                                    <li><i class="ti-email"></i><a href="{{ route('login.form') }}">聯絡客服</a>
+                                    <li><i class="ti-email"></i><a href="{{ route('zshop-contact') }}">聯絡客服</a>
                                     </li>
                                 @endauth
                             </ul>
@@ -74,7 +74,7 @@
                                         <div class="nav-inner col-12">
                                             <ul class="nav main-menu menu navbar-nav d-flex justify-content-between">
                                                 @foreach ($category as $cat_info)
-                                                    <li><a href="{{ route('productlist-category',['slug'=>$cat_info->slug,'title'=>$cat_info->title]) }}">{{ $cat_info->title }}</a></li>
+                                                    <li><a href="{{ route('zshop-productlist-category',['slug'=>$cat_info->slug,'title'=>$cat_info->title]) }}">{{ $cat_info->title }}</a></li>
                                                 @endforeach                             
                                             </ul>
                                         </div>

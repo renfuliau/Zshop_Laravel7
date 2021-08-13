@@ -4150,9 +4150,6 @@ Version:1.0
 .main-sidebar .categor-list {
 	margin-top: 15px;
 }
-.main-sidebar .categor-list li{
-
-}
 .main-sidebar .categor-list li {
 	margin-bottom: 10px;
 }
@@ -4185,7 +4182,6 @@ Version:1.0
 	visibility:visible;
 }
 /* Recent Post */
-.main-sidebar .recent-post{}
 .main-sidebar .single-post {
 	position: relative;
 	border-bottom: 1px solid #ddd;
@@ -4195,9 +4191,6 @@ Version:1.0
 .main-sidebar .single-post:last-child{
 	padding-bottom:0px;
 	border:none;
-}
-.main-sidebar .single-post .image {
-
 }
 .main-sidebar .single-post .image img{
 	float: left;
@@ -4913,3 +4906,11 @@ Version:1.0
 /*=============================
 	End Footer CSS
 ===============================*/
+
+/* .row.display-table {
+    display: table;
+ }
+ .row.display-table [class*=’col-’] {
+    float: none;
+    display: table-cell;
+ } */

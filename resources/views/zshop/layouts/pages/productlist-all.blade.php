@@ -12,15 +12,7 @@
                 <div class="bread-inner">
                     <ul class="bread-list">
                         <li><a href="{{ route('zshop-index') }}">首頁<i class="ti-arrow-right"></i></a></li>
-                        @foreach ($category as $cat_info)
-                            <li class="active"><a
-                                    href="{{ route('zshop-productlist-category', ['slug' => $cat_info->slug, 'title' => $cat_info->title]) }}">
-                        @endforeach{{ $title }}</a></li>
-
-                        @if (isset($subtitle))
-                            <li class="active"><i class="ti-arrow-right"></i><a
-                                    href="javascript:void(0);">{{ $subtitle }}</a></li>
-                        @endif
+                        <li class="active"><a href="javascript:void(0);">產品清單</a></li>
                     </ul>
                 </div>
             </div>
@@ -255,9 +247,10 @@
                                                         $after_discount = $product->price - ($product->price * $product->discount) / 100;
                                                     @endphp
                                                     <del>原價 ${{ number_format($product->price, 2) }}</del>
-                                                    <h5 class="text-danger">特價 ${{ number_format($after_discount, 2) }}</h5>
-                                                    <a href="{{ route('add-to-cart', $product->slug) }}" class="btn cart"
-                                                        data-id="{{ $product->id }}">加入購物車</a>
+                                                    <h5 class="text-danger">特價
+                                                        ${{ number_format($after_discount, 2) }}</h5>
+                                                    <a href="{{ route('add-to-cart', $product->slug) }}"
+                                                        class="btn cart" data-id="{{ $product->id }}">加入購物車</a>
                                                 </div>
                                             </div>
                                         </div>

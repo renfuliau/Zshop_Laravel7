@@ -19,8 +19,14 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('address')->nullable();
             $table->string('photo')->nullable();
             $table->enum('role',['admin','user'])->default('user');
+            $table->integer('total_shopping_amount')->default(0);
+            $table->integer('reward_money')->default(0);
+            $table->integer('user_level_id')->unsigned()->nullable();
+            $table->foreign('user_level_id')->references('id')->on('user_levels')->onDelete('SET NULL');
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
             $table->enum('status',['active','inactive'])->default('active');

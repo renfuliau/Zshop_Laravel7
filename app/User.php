@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','role','photo','status','provider','provider_id',
+        'name', 'email', 'password', 'role', 'phone', 'address', 'total_shopping_amount', 'reward_money', 'user_level_id', 'photo', 'status', 'provider', 'provider_id',
     ];
 
     /**
@@ -37,7 +37,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function orders(){
+    public function orders()
+    {
         return $this->hasMany('App\Models\Order');
+    }
+
+    public function user_level()
+    {
+        return $this->hasOne('App\Models\UserLevel', 'id', 'user_level_id');
     }
 }

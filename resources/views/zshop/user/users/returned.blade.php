@@ -20,7 +20,7 @@
                     <a class="nav-link" href="{{ route('zshop-user-home')}}">個人中心</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('zshop-user-zshop-money')}}">購物金</a>
+                    <a class="nav-link" href="{{ route('zshop-user-reward-money')}}">購物金</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('zshop-user-orders')}}">訂單查詢</a>

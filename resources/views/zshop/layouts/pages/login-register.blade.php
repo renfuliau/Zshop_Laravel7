@@ -1,6 +1,6 @@
 @extends('zshop.layouts.main')
 
-@section('title', 'E-Shop || Login Page')
+@section('title', 'ZShop - 登入 / 註冊')
 
 @section('main-content')
 <!-- Breadcrumbs -->
@@ -10,7 +10,7 @@
             <div class="col-12">
                 <div class="bread-inner">
                     <ul class="bread-list">
-                        <li><a href="{{ route('home') }}">首頁<i class="ti-arrow-right"></i></a></li>
+                        <li><a href="{{ route('zshop-index') }}">首頁<i class="ti-arrow-right"></i></a></li>
                         <li class="active"><a href="javascript:void(0);">登入 / 註冊</a></li>
                     </ul>
                 </div>

@@ -35,6 +35,6 @@ class MatchOldPassword implements Rule
      */
     public function message()
     {
-        return 'Current password must match with old password';
+        return '原始密碼錯誤，請確認後再嘗試！';
     }
 }
