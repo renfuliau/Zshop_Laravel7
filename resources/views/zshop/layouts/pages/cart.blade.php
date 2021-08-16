@@ -66,7 +66,7 @@
                                                     </button>
                                                 </div>
                                                 <input type="text" name="quant[{{ $key }}]"
-                                                    class="input-number" data-min="1" data-max="100"
+                                                    class="input-number" data-min="1" data-max="{{ $value->product->stock }}"
                                                     value="{{ $value->quantity }}">
                                                 <input type="hidden" name="qty_id[]" value="{{ $value->id }}">
                                                 <div class="button plus">
@@ -108,31 +108,67 @@
                     <div class="row">
                         <div class="col-lg-8 col-md-5 col-12">
                             <div class="left">
-                                @if (!empty($coupon1) && !empty($ocupon2))
+                                @if (!empty($coupon1) && !empty($coupon2))
+                                    <h6 class="mb-3">選擇優惠:</h6>
+                                    <div class="col">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="receipt_option"
+                                                id="receipt_option" value="二聯式發票" checked>
+                                            <label class="form-check-label" for="exampleRadios1">
+                                                {{ $coupon1->name }}
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="receipt_option"
+                                                id="receipt_option" value="三聯式發票">
+                                            <label class="form-check-label" for="exampleRadios2">
+                                                {{ $coupon2->name }}
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div class="coupon">
+                                        <h6>選擇優惠:</h6>
+                                        <input type="hidden" name="coupon_value" value="" />
                                         <select id="coupon_name" class="custom-select">
                                             <option selected value="1">{{ $coupon1->name }}</option>
                                             <option value="2">{{ $coupon2->name }}</option>
                                         </select>
-                                    </div>  
+                                    </div>
                                 @endif
-                                {{-- <div class="coupon">
-                                    <select id="coupon_name" class="custom-select">
-                                        <option selected value="1">{{ $coupon1->name }}</option>
-                                        <option value="2">{{ $coupon2->name }}</option>
-                                    </select>
-                                </div> --}}
+                                @if (!empty($coupon1) && empty($coupon2))
+                                    <div class="coupon">
+                                        <h6>選擇優惠:</h6>
+                                        <select id="coupon_name" class="custom-select">
+                                            <option selected value="1">{{ $coupon1->name }}</option>
+                                            <option value="2">{{ $coupon2->name }}</option>
+                                        </select>
+                                    </div>
+                                @endif
+                                @if (empty($coupon1) && !empty($coupon2))
+                                    <div class="coupon">
+                                        <h6>選擇優惠:</h6>
+                                        <select id="coupon_name" class="custom-select">
+                                            <option selected value="1">{{ $coupon1->name }}</option>
+                                            <option value="2">{{ $coupon2->name }}</option>
+                                        </select>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-7 col-12">
                             <div class="right">
                                 <ul>
-                                    <li class="order_subtotal" data-price="{{ Helper::totalCartPrice() }}">Cart
-                                        Subtotal<span>${{ number_format(Helper::totalCartPrice(), 2) }}</span></li>
-                                    @if (session()->has('coupon'))
-                                        <li class="coupon_price" data-price="{{ Session::get('coupon')['value'] }}">
-                                            You
-                                            Save<span>${{ number_format(Session::get('coupon')['value'], 2) }}</span>
+                                    <li class="order_subtotal" data-price="{{ Helper::totalCartPrice() }}">小計
+                                        <span>${{ number_format(Helper::totalCartPrice(), 2) }}</span>
+                                    </li>
+                                    @if ($coupon1)
+                                        <li class="coupon_price" data-price="{{ $coupon1['value'] }}">
+                                            折扣<span id="coupon1_value">$ {{ $coupon1['value'] * -1 }}</span>
+                                        </li>
+                                    @endif
+                                    @if ($coupon2)
+                                        <li class="coupon_price" data-price="{{ $coupon1['value'] }}">
+                                            贈送購物金<span id="coupon2_value">$ {{ $coupon1['value'] * -1 }}</span>
                                         </li>
                                     @endif
                                     @php
@@ -235,15 +271,23 @@
             $('#order_total_price span').text('$' + (subtotal + cost - coupon).toFixed(2));
         });
 
-        // $('#coupon_name')
-        //     .change(function() {
-        //         var str = "";
-        //         $("select option:selected").each(function() {
-        //             str += $(this).text() + " ";
-        //         });
-        //         $("div").text(str);
-        //     })
-        //     .trigger("change");
+        $("#coupon_name").change(function() {
+            // 宣告product_num 為選取元素的value
+            var product_num = $(this).val();
+            // 宣告class_num 等於字串轉數字 +1
+            // var class_num = parseInt(product_num) + 1;
+            // 透過name選取product_id,並寫入新的值
+            $("input[name='coupon_value']").val(product_num);
+
+            // 透過name選取product_class_id,並寫入product_num+1
+            // $("input[name='product_class_id']").val(class_num);
+
+            // 透過id選取product_id,並寫入新的值
+            // $("#price_2").val("3456");
+
+            alert("after change product_id value = " + $("input[name='coupon_value']").val());
+            // alert("after change price_2 value = " + $("#price_2").val());
+        });
     });
 </script>
 

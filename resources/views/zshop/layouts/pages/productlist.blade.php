@@ -1,6 +1,6 @@
 @extends('zshop.layouts.main')
 
-@section('title', 'E-SHOP || PRODUCT PAGE')
+@section('title', 'ZShop - ' . $title)
 
 @section('main-content')
 
@@ -13,7 +13,7 @@
                     <ul class="bread-list">
                         <li><a href="{{ route('zshop-index') }}">首頁<i class="ti-arrow-right"></i></a></li>
                         @foreach ($category as $cat_info)
-                            <li class="active"><a
+                            <li><a
                                     href="{{ route('zshop-productlist-category', ['slug' => $cat_info->slug, 'title' => $cat_info->title]) }}">
                         @endforeach{{ $title }}</a></li>
 
@@ -129,7 +129,7 @@
                                     </div>
                                     <div class="content">
                                         <h5><a
-                                                href="{{ route('product-detail', $product->slug) }}">{{ $product->title }}</a>
+                                                href="{{ route('zshop-product-detail', $product->slug) }}">{{ $product->title }}</a>
                                         </h5>
                                         @php
                                             $org = $product->price - ($product->price * $product->discount) / 100;
@@ -210,7 +210,7 @@
                                         <div class="col-lg-4 col-md-6 col-sm-6">
                                             <div class="single-product">
                                                 <div class="product-img">
-                                                    <a href="{{ route('product-detail', $product->slug) }}">
+                                                    <a href="{{ route('zshop-product-detail', $product->slug) }}">
                                                         @php
                                                             $photo = explode(',', $product->photo);
                                                         @endphp
@@ -225,14 +225,14 @@
                                                                 title="Quick View" href="#"><i
                                                                     class=" ti-eye"></i><span>Quick Shop</span></a>
                                                             <a title="Wishlist"
-                                                                href="{{ route('add-to-wishlist', $product->slug) }}"
+                                                                href="{{ route('zshop-add-to-wishlist', $product->slug) }}"
                                                                 class="wishlist" data-id="{{ $product->id }}"><i
                                                                     class=" ti-heart "></i><span>Add to
                                                                     Wishlist</span></a>
                                                         </div>
                                                         <div class="product-action-2">
                                                             <a title="Add to cart"
-                                                                href="{{ route('add-to-cart', $product->slug) }}">Add
+                                                                href="{{ route('zshop-add-to-cart', $product->slug) }}">Add
                                                                 to
                                                                 cart</a>
                                                         </div>
@@ -244,7 +244,7 @@
                                             <div class="list-content row">
                                                 <div class="product-content col-8">
                                                     <h3 class="title"><a
-                                                            href="{{ route('product-detail', $product->slug) }}">{{ $product->title }}</a>
+                                                            href="{{ route('zshop-product-detail', $product->slug) }}">{{ $product->title }}</a>
                                                     </h3>
                                                     <p class="des pt-2">{!! html_entity_decode($product->summary) !!}</p>
                                                     {{-- <p>{!! html_entity_decode($product->summary) !!}</p> --}}

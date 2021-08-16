@@ -19,7 +19,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->float('sub_total');
             $table->unsignedBigInteger('shipping_id')->nullable();
-            $table->unsignedBigInteger('coupon_id')->unsigned()->nullable(); // new
+            $table->unsignedBigInteger('coupon_id')->nullable(); // new
             $table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('SET NULL'); // new
             $table->float('coupon')->nullable();
             $table->integer('reward-money'); // new
@@ -32,10 +32,10 @@ class CreateOrdersTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('SET NULL');
             $table->foreign('shipping_id')->references('id')->on('shippings')->onDelete('SET NULL');
             $table->string('first_name');
-            $table->string('last_name');
-            $table->string('email');
+            $table->string('last_name')->nullable();
+            $table->string('email')->nullable();
             $table->string('phone');
-            $table->string('country');
+            $table->string('country')->nullable();
             $table->string('post_code')->nullable();
             $table->text('address1');
             $table->text('address2')->nullable();

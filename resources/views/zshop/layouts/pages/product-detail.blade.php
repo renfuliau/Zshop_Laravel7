@@ -1,4 +1,4 @@
-@extends('frontend.layouts.master')
+@extends('zshop.layouts.main')
 
 @section('meta')
 	<meta charset="utf-8">
@@ -14,7 +14,7 @@
 	<meta property="og:image" content="{{$product_detail->photo}}">
 	<meta property="og:description" content="{{$product_detail->description}}">
 @endsection
-@section('title','E-SHOP || PRODUCT DETAIL')
+@section('title','ZShop - ' . $product_detail->title)
 @section('main-content')
 
 		<!-- Breadcrumbs -->
@@ -24,8 +24,10 @@
 					<div class="col-12">
 						<div class="bread-inner">
 							<ul class="bread-list">
-								<li><a href="{{route('home')}}">Home<i class="ti-arrow-right"></i></a></li>
-								<li class="active"><a href="">Shop Details</a></li>
+								<li><a href="{{route('zshop-index')}}">首頁<i class="ti-arrow-right"></i></a></li>
+								<li><a href="{{ route('zshop-productlist-category', ['slug' => $product_detail->cat_info->slug, 'title' => $product_detail->cat_info->title]) }}">
+                                    {{ $product_detail->cat_info->title }}<i class="ti-arrow-right"></i></a></li>
+                                <li class="active"><a href="javascript:void(0);">{{ $product_detail->title }}</a></li>
 							</ul>
 						</div>
 					</div>
@@ -66,40 +68,13 @@
 											<!-- Description -->
 											<div class="short">
 												<h4>{{$product_detail->title}}</h4>
-												<div class="rating-main">
-													<ul class="rating">
-														@php
-															$rate=ceil($product_detail->getReview->avg('rate'))
-														@endphp
-															@for($i=1; $i<=5; $i++)
-																@if($rate>=$i)
-																	<li><i class="fa fa-star"></i></li>
-																@else
-																	<li><i class="fa fa-star-o"></i></li>
-																@endif
-															@endfor
-													</ul>
-													<a href="#" class="total-review">({{$product_detail['getReview']->count()}}) Review</a>
-                                                </div>
                                                 @php
                                                     $after_discount=($product_detail->price-(($product_detail->price*$product_detail->discount)/100));
                                                 @endphp
 												<p class="price"><span class="discount">${{number_format($after_discount,2)}}</span><s>${{number_format($product_detail->price,2)}}</s> </p>
 												<p class="description">{!!($product_detail->summary)!!}</p>
 											</div>
-											<!--/ End Description -->
-											<!-- Color -->
-											{{-- <div class="color">
-												<h4>Available Options <span>Color</span></h4>
-												<ul>
-													<li><a href="#" class="one"><i class="ti-check"></i></a></li>
-													<li><a href="#" class="two"><i class="ti-check"></i></a></li>
-													<li><a href="#" class="three"><i class="ti-check"></i></a></li>
-													<li><a href="#" class="four"><i class="ti-check"></i></a></li>
-												</ul>
-											</div> --}}
-											<!--/ End Color -->
-											<!-- Size -->
+											
 											@if($product_detail->size)
 												<div class="size mt-4">
 													<h4>Size</h4>
@@ -129,7 +104,7 @@
 																</button>
 															</div>
 															<input type="hidden" name="slug" value="{{$product_detail->slug}}">
-															<input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1" id="quantity">
+															<input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="{{$product_detail->stock}}" value="1" id="quantity">
 															<div class="button plus">
 																<button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
 																	<i class="ti-plus"></i>
@@ -139,16 +114,11 @@
 													<!--/ End Input Order -->
 													</div>
 													<div class="add-to-cart mt-4">
-														<button type="submit" class="btn">Add to cart</button>
-														<a href="{{route('add-to-wishlist',$product_detail->slug)}}" class="btn min"><i class="ti-heart"></i></a>
+														<button type="submit" class="btn">加入購物車</button>
+														<a href="{{route('zshop-add-to-wishlist',$product_detail->slug)}}" class="btn min"><i class="ti-heart"></i></a>
 													</div>
 												</form>
-
-												<p class="cat">  :<a href="{{route('product-cat',$product_detail->cat_info['slug'])}}">{{$product_detail->cat_info['title']}}</a></p>
-												@if($product_detail->sub_cat_info)
-												<p class="cat mt-1">Sub Category :<a href="{{route('product-sub-cat',[$product_detail->cat_info['slug'],$product_detail->sub_cat_info['slug']])}}">{{$product_detail->sub_cat_info['title']}}</a></p>
-												@endif
-												<p class="availability">Stock : @if($product_detail->stock>0)<span class="badge badge-success">{{$product_detail->stock}}</span>@else <span class="badge badge-danger">{{$product_detail->stock}}</span>  @endif</p>
+												<p class="availability">庫存量 : @if($product_detail->stock>0)<span class="badge badge-success">{{$product_detail->stock}}</span>@else <span class="badge badge-danger">{{$product_detail->stock}}</span>  @endif</p>
 											</div>
 											<!--/ End Product Buy -->
 										</div>

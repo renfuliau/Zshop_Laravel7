@@ -49,9 +49,34 @@
                     <h5 class="card-title text-left my-4"><small><i class="ti-wallet"></i>
                             現有購物金： {{ $profile->reward_money }}</small>
                     </h5>
+                    {{-- <h5 class="card-title text-left my-4"><small><i class="ti-view-list-alt"></i>
+                        購物金紀錄：</small> --}}
+                </h5>
                 </div>
             </div>
         </div>
+        <table class="table shopping-summery">
+            <thead>
+                <tr class="main-hading">
+                    <th>日期</th>
+                    <th>購物金項目</th>
+                    <th class="text-center">購物金款項</th>
+                    <th class="text-center">購物金餘額</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if($reward_money_history)
+                    @foreach($reward_money_history as $key => $value)
+                        <tr>
+                            <td class="date" data-title="date"><span>${{$value['created_at']}}</span></td>
+                            <td class="reward_item" data-title="reward_item"><span>${{$value['reward_item']}}</span></td>
+                            <td class="amount" data-title="amount"><span>${{$value['amount']}}</span></td>
+                            <td class="total" data-title="total"><span>${{$value['total']}}</span></td>
+                        </tr>
+                    @endforeach
+                @endif
+            </tbody>
+        </table>
     </div>
 </div>
 

@@ -25,8 +25,8 @@ class CreateUsersTable extends Migration
             $table->enum('role',['admin','user'])->default('user');
             $table->integer('total_shopping_amount')->default(0);
             $table->integer('reward_money')->default(0);
-            $table->integer('user_level_id')->unsigned()->nullable();
-            $table->foreign('user_level_id')->references('id')->on('user_levels')->onDelete('SET NULL');
+            $table->unsignedBigInteger('user_level_id')->nullable(); // new
+            $table->foreign('user_level_id')->references('id')->on('user_levels')->onDelete('SET NULL'); // new
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
             $table->enum('status',['active','inactive'])->default('active');

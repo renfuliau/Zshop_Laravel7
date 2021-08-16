@@ -215,13 +215,14 @@ Route::group(['prefix' => 'zshop'], function () {
     Route::get('/productlist', 'ZshopController@productlist')->name('zshop-productlist');
     Route::get('/productlist-category/{slug}', 'ZshopController@productlistByCategory')->name('zshop-productlist-category');
     Route::get('/productlist-category/{slug}/{sub_slug}', 'ZshopController@productSubcategory')->name('zshop-productlist-subcategory');
-    Route::get('/product-detail/{slug}', 'ZshopController@productDetail')->name('product-detail');
+    Route::get('/product-detail/{slug}', 'ZshopController@productDetail')->name('zshop-product-detail');
     Route::post('/product/search', 'ZshopController@productSearch')->name('product.search');
     Route::get('/product-brand/{slug}', 'ZshopController@productBrand')->name('product-brand');
 
     // 購物車
     Route::get('/cart', 'ZshopController@cart')->name('zshop-cart');
     Route::get('/checkout', 'ZshopController@checkout')->name('zshop-checkout')->middleware('user');
+    Route::post('/checkout/store', 'ZshopController@checkoutStore')->name('zshop-checkoutStore');
     Route::get('/add-to-cart/{slug}', 'ZshopController@addToCart')->name('zshop-add-to-cart')->middleware('user');
     Route::post('/add-to-cart', 'ZshopController@singleAddToCart')->name('zshop-single-add-to-cart')->middleware('user');
     Route::get('cart-delete/{id}', 'ZshopController@cartDelete')->name('zshop-cart-delete');
@@ -236,8 +237,14 @@ Route::group(['prefix' => 'zshop/user'], function () {
     Route::post('/change-password', 'ZshopController@changPasswordStore')->name('zshop-user-change-password-update');
 
     Route::get('/reward-money', 'ZshopController@rewardMoney')->name('zshop-user-reward-money');
+
     Route::get('/orders', 'ZshopController@orders')->name('zshop-user-orders');
+
     Route::get('/returned', 'ZshopController@returned')->name('zshop-user-returned');
+
     Route::get('/wishlist', 'ZshopController@wishlist')->name('zshop-user-wishlist');
+    Route::get('/wishlist/{slug}', 'ZshopController@addToWishlist')->name('zshop-add-to-wishlist')->middleware('user');
+    Route::get('/wishlist-delete/{id}', 'ZshopController@wishlistDelete')->name('zshop-wishlist-delete');
+
     Route::get('/qa-center', 'ZshopController@qaCenter')->name('zshop-user-qa-center');
 });

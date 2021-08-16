@@ -4907,10 +4907,6 @@ Version:1.0
 	End Footer CSS
 ===============================*/
 
-/* .row.display-table {
-    display: table;
- }
- .row.display-table [class*=’col-’] {
-    float: none;
-    display: table-cell;
- } */
+.shopping-cart .total-amount .left .form-check-label{
+    font-size: 16px;
+}

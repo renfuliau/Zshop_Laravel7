@@ -11,6 +11,7 @@ use App\Models\Banner;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Coupon;
+use App\Models\RewardMoneyHistory;
 use App\Models\Settings;
 use App\Models\Wishlist;
 use App\Models\UserLevel;
@@ -41,10 +42,10 @@ class ZshopController extends Controller
         $data = $request->all();
         if (Auth::attempt(['email' => $data['email'], 'password' => $data['password'], 'status' => 'active'])) {
             Session::put('user', $data['email']);
-            request()->session()->flash('success', 'Successfully login');
+            request()->session()->flash('success', '成功登入');
             return redirect()->route('zshop-index');
         } else {
-            request()->session()->flash('error', 'Invalid email and password pleas try again!');
+            request()->session()->flash('error', '帳號或密碼錯誤，請確認後再試!');
             return redirect()->back();
         }
     }
@@ -62,10 +63,10 @@ class ZshopController extends Controller
         $check = $this->create($data);
         Session::put('user', $data['email']);
         if ($check) {
-            request()->session()->flash('success', 'Successfully registered');
+            request()->session()->flash('success', '註冊成功');
             return redirect()->route('zshop-login-register');
         } else {
-            request()->session()->flash('error', 'Please try again!');
+            request()->session()->flash('error', '系統錯誤，請聯繫客服!');
             return back();
         }
     }
@@ -188,6 +189,16 @@ class ZshopController extends Controller
         // }
     }
 
+    public function productDetail($slug)
+    {
+        $category = Category::getAllParentWithChild();
+        $product_detail = Product::getProductBySlug($slug);
+        // dd($product_detail->cat_info);
+        return view('zshop.layouts.pages.product-detail')
+            ->with('category', $category)
+            ->with('product_detail', $product_detail);
+    }
+
 
 
     // 購物車
@@ -203,7 +214,8 @@ class ZshopController extends Controller
         $user = Auth()->user();
         // dd($user);
         $cart = Cart::with('product')->where('user_id', $user->id)->where('order_id', null)->get();
-
+        // $products = $cart->product;
+        // dd($cart);
         $total_amount = 0;
         foreach ($cart as $key => $value) {
             $total_amount += $value->amount;
@@ -215,7 +227,7 @@ class ZshopController extends Controller
                 ['coupon_type', '=', 1]
             ])->get()->max('coupon_line')],
             ['coupon_type', '=', 1]
-        ])->first           ();
+        ])->first();
         // dd($coupon1);
 
         $coupon2 = Coupon::where([
@@ -240,17 +252,89 @@ class ZshopController extends Controller
         return view('zshop.layouts.pages.checkout')->with('category', $category);
     }
 
+    public function checkoutStore(Request $request)
+    {
+        $this->validate($request, [
+            'first_name' => 'string|required',
+            'phone' => 'required',
+            'post_code' => 'string|required',
+            'address1' => 'string|required',
+        ]);
+        // return $request->all();
+
+        if (empty(Cart::where('user_id', auth()->user()->id)->where('order_id', null)->first())) {
+            request()->session()->flash('error', '購物車為空，請確認購物車商品!');
+            return back();
+        }
+        $order = new Order();
+        $order_data = $request->all();
+        $order_data['order_number'] = 'ORD-' . strtoupper(Str::random(10));
+        $order_data['user_id'] = $request->user()->id;
+        $order_data['shipping_id'] = $request->shipping;
+        $shipping = Shipping::where('id', $order_data['shipping_id'])->pluck('price');
+        // return session('coupon')['value'];
+        $order_data['sub_total'] = Helper::totalCartPrice();
+        $order_data['quantity'] = Helper::cartCount();
+        if (session('coupon')) {
+            $order_data['coupon'] = session('coupon')['value'];
+        }
+        if ($request->shipping) {
+            if (session('coupon')) {
+                $order_data['total_amount'] = Helper::totalCartPrice() + $shipping[0] - session('coupon')['value'];
+            } else {
+                $order_data['total_amount'] = Helper::totalCartPrice() + $shipping[0];
+            }
+        } else {
+            if (session('coupon')) {
+                $order_data['total_amount'] = Helper::totalCartPrice() - session('coupon')['value'];
+            } else {
+                $order_data['total_amount'] = Helper::totalCartPrice();
+            }
+        }
+        // return $order_data['total_amount'];
+        $order_data['status'] = "new";
+        if (request('payment_method') == 'paypal') {
+            $order_data['payment_method'] = 'paypal';
+            $order_data['payment_status'] = 'paid';
+        } else {
+            $order_data['payment_method'] = 'cod';
+            $order_data['payment_status'] = 'Unpaid';
+        }
+        $order->fill($order_data);
+        $status = $order->save();
+        if ($order)
+            // dd($order->id);
+            $users = User::where('role', 'admin')->first();
+        $details = [
+            'title' => 'New order created',
+            'actionURL' => route('order.show', $order->id),
+            'fas' => 'fa-file-alt'
+        ];
+        Notification::send($users, new StatusNotification($details));
+        if (request('payment_method') == 'paypal') {
+            return redirect()->route('payment')->with(['id' => $order->id]);
+        } else {
+            session()->forget('cart');
+            session()->forget('coupon');
+        }
+        Cart::where('user_id', auth()->user()->id)->where('order_id', null)->update(['order_id' => $order->id]);
+
+        // dd($users);
+        request()->session()->flash('success', '訂單已成功送出，感謝您的支持');
+        return redirect()->route('home');
+    }
+
     public function addToCart(Request $request)
     {
         // dd($request->all());
         if (empty($request->slug)) {
-            request()->session()->flash('error', 'Invalid Products');
+            request()->session()->flash('error', '商品不存在，請聯繫客服！');
             return back();
         }
         $product = Product::where('slug', $request->slug)->first();
         // return $product;
         if (empty($product)) {
-            request()->session()->flash('error', 'Invalid Products');
+            request()->session()->flash('error', '商品不存在，請聯繫客服！');
             return back();
         }
 
@@ -275,7 +359,7 @@ class ZshopController extends Controller
             $cart->save();
             $wishlist = Wishlist::where('user_id', auth()->user()->id)->where('cart_id', null)->update(['cart_id' => $cart->id]);
         }
-        request()->session()->flash('success', 'Product successfully added to cart');
+        request()->session()->flash('success', '商品成功加入購物車');
         return back();
     }
 
@@ -304,9 +388,9 @@ class ZshopController extends Controller
         $data = $request->all();
         $status = $user->fill($data)->save();
         if ($status) {
-            request()->session()->flash('success', 'Successfully updated your profile');
+            request()->session()->flash('success', '個人資料已更新');
         } else {
-            request()->session()->flash('error', 'Please try again!');
+            request()->session()->flash('error', '發生錯誤，請稍後再試!');
         }
         return redirect()->back();
     }
@@ -342,10 +426,16 @@ class ZshopController extends Controller
     {
         $category = Category::getAllParentWithChild();
         $profile = Auth()->user();
+        $reward_money_history = RewardMoneyHistory::where('user_id', $profile->id)
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
+        // dd($reward_money_history);
         // return $profile;
         return view('zshop.user.users.reward-money')
             ->with('category', $category)
-            ->with('profile', $profile);
+            ->with('profile', $profile)
+            ->with('reward_money_history', $reward_money_history);
     }
 
     public function orders()
@@ -376,6 +466,52 @@ class ZshopController extends Controller
         return view('zshop.user.users.wishlist')
             ->with('category', $category)
             ->with('profile', $profile);
+    }
+
+    public function addToWishlist(Request $request)
+    {
+        // dd($request->all());
+        if (empty($request->slug)) {
+            request()->session()->flash('error', '未知的產品，請聯絡客服');
+            return back();
+        }
+        $product = Product::where('slug', $request->slug)->first();
+        // return $product;
+        if (empty($product)) {
+            request()->session()->flash('error', '未知的產品，請聯絡客服');
+            return back();
+        }
+
+        $already_wishlist = Wishlist::where('user_id', auth()->user()->id)->where('cart_id', null)->where('product_id', $product->id)->first();
+        // return $already_wishlist;
+        if ($already_wishlist) {
+            request()->session()->flash('error', '此商品已經存在於收藏清單');
+            return back();
+        } else {
+
+            $wishlist = new Wishlist;
+            $wishlist->user_id = auth()->user()->id;
+            $wishlist->product_id = $product->id;
+            $wishlist->price = ($product->price - ($product->price * $product->discount) / 100);
+            $wishlist->quantity = 1;
+            $wishlist->amount = $wishlist->price * $wishlist->quantity;
+            if ($wishlist->product->stock < $wishlist->quantity || $wishlist->product->stock <= 0) return back()->with('error', 'Stock not sufficient!.');
+            $wishlist->save();
+        }
+        request()->session()->flash('success', '商品已加入收藏清單');
+        return back();
+    }
+
+    public function wishlistDelete(Request $request)
+    {
+        $wishlist = Wishlist::find($request->id);
+        if ($wishlist) {
+            $wishlist->delete();
+            request()->session()->flash('success', '商品已經移出收藏清單');
+            return back();
+        }
+        request()->session()->flash('error', '發生錯誤，請聯絡客服');
+        return back();
     }
 
     public function qaCenter()

@@ -62,24 +62,15 @@
                             @endphp
                             <td class="image" data-title="No"><img src="{{$photo[0]}}" alt="{{$photo[0]}}"></td>
                             <td class="product-des text-center" data-title="Description">
-                                <p class="product-name"><a href="{{route('product-detail',$wishlist->product['slug'])}}">{{$wishlist->product['title']}}</a></p>
+                                <p class="product-name"><a href="{{route('zshop-product-detail',$wishlist->product['slug'])}}">{{$wishlist->product['title']}}</a></p>
                                 <p class="product-des">{!!($wishlist['summary']) !!}</p>
                             </td>
                             <td class="total-amount" data-title="Total"><span>${{$wishlist['amount']}}</span></td>
-                            <td class="text-center"><a href="{{route('add-to-cart',$wishlist->product['slug'])}}"><i class="ti-shopping-cart"></i></a></td>
-                            <td class="action" data-title="Remove"><a href="{{route('wishlist-delete',$wishlist->id)}}"><i class="ti-trash remove-icon"></i></a></td>
+                            <td class="text-center"><a href="{{route('zshop-add-to-cart',$wishlist->product['slug'])}}"><i class="ti-shopping-cart"></i></a></td>
+                            <td class="action" data-title="Remove"><a href="{{route('zshop-wishlist-delete',$wishlist->id)}}"><i class="ti-trash remove-icon"></i></a></td>
                         </tr>
                     @endforeach
-                @else 
-                    <tr>
-                        <td class="text-center">
-                            There are no any wishlist available. <a href="{{route('product-grids')}}" style="color:blue;">Continue shopping</a>
-
-                        </td>
-                    </tr>
                 @endif
-
-
             </tbody>
         </table>
     </div>

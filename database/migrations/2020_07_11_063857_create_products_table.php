@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->enum('status',['active','inactive'])->default('inactive');
             $table->float('price');
             $table->float('discount')->nullabale();
+            $table->integer('special_price');
             $table->boolean('is_featured')->deault(false);
             $table->unsignedBigInteger('cat_id')->nullable();
             $table->unsignedBigInteger('child_cat_id')->nullable();
