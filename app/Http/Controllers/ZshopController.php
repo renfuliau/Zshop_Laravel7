@@ -11,6 +11,7 @@ use App\Models\Banner;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Coupon;
+use App\Models\Order;
 use App\Models\RewardMoneyHistory;
 use App\Models\Settings;
 use App\Models\Wishlist;
@@ -442,20 +443,24 @@ class ZshopController extends Controller
     {
         $category = Category::getAllParentWithChild();
         $profile = Auth()->user();
+        $orders = Order::where('user_id', $profile->id)->get();
         // return $profile;
         return view('zshop.user.users.orders')
             ->with('category', $category)
-            ->with('profile', $profile);
+            ->with('profile', $profile)
+            ->with('orders', $orders);
     }
 
     public function returned()
     {
         $category = Category::getAllParentWithChild();
         $profile = Auth()->user();
+        $orders = Order::where('user_id', $profile->id)->get();
         // return $profile;
         return view('zshop.user.users.returned')
             ->with('category', $category)
-            ->with('profile', $profile);
+            ->with('profile', $profile)
+            ->with('orders', $orders);
     }
 
     public function wishlist()
